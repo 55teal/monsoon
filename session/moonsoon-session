@@ -1,0 +1,15 @@
+#!/bin/sh
+# MONSOON console session: cage (single-app Wayland compositor) running the MONSOON shell.
+# Logs to ~/monsoon-session.log. If it fails at startup it retries once in software-rendering mode, then reports why instead of looping.
+export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=MONSOON WLR_NO_HARDWARE_CURSORS=1
+export MONSOON_REAL="${MONSOON_REAL:-1}"
+LOG="$HOME/monsoon-session.log"
+{ echo "== $(date) =="; id; echo "XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR"; ls -l /dev/dri 2>&1; lsmod | grep -E 'nvidia|i915|nouveau'; dkms status 2>&1; } > "$LOG" 2>&1
+run() { cage -s -- electron --ozone-platform=wayland "$@" /opt/monsoon >> "$LOG" 2>&1; }
+t=$(date +%s); run; rc=$?
+if [ $rc -ne 0 ] && [ $(( $(date +%s) - t )) -lt 15 ]; then
+  echo "== retry: software rendering ==" >> "$LOG"
+  WLR_RENDERER_ALLOW_SOFTWARE=1 LIBGL_ALWAYS_SOFTWARE=1 run --disable-gpu; rc=$?
+fi
+[ $rc -eq 0 ] || { echo "MONSOON failed to start (exit $rc). Log: $LOG"; tail -n 25 "$LOG"; }
+exit $rc
