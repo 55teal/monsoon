@@ -1,1 +1,6 @@
-
+[Desktop Entry]
+Name=MONSOON
+Comment=MONSOON console session
+Exec=/usr/local/bin/monsoon-session
+Type=Application
+DesktopNames=MONSOON
