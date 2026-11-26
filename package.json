@@ -1,0 +1,1 @@
+{"name": "monsoon", "version": "0.2.0", "description": "MONSOON console shell", "main": "main.js", "scripts": {"start": "MONSOON_WINDOWED=1 electron --ozone-platform=wayland ."}, "license": "UNLICENSED"}
